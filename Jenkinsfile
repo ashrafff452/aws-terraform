@@ -13,7 +13,7 @@ pipeline {
         stage('Git Clone') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/ashrafff452/terraform-jenkins.git'
+                    url: 'https://github.com/ashrafff452/aws-terraform.git'
             }
         }
 
