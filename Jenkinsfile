@@ -4,6 +4,7 @@ pipeline {
     tools {
         terraform 'terraform'
     }
+
     environment {
         AWS_DEFAULT_REGION = 'us-east-1'
     }
@@ -17,13 +18,12 @@ pipeline {
             }
         }
 
-       stage('Terraform Init') {
+        stage('Terraform Init') {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws_credentials'
                 ]]) {
-
                     sh 'terraform init'
                 }
             }
@@ -31,13 +31,23 @@ pipeline {
 
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan'
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws_credentials'
+                ]]) {
+                    sh 'terraform plan'
+                }
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                sh 'terraform apply -auto-approve'
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws_credentials'
+                ]]) {
+                    sh 'terraform apply -auto-approve'
+                }
             }
         }
     }
@@ -49,6 +59,10 @@ pipeline {
 
         failure {
             echo 'Terraform deployment failed'
+        }
+
+        always {
+            cleanWs()
         }
     }
 }
