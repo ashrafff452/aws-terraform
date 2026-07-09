@@ -4,6 +4,9 @@ pipeline {
     tools {
         terraform 'terraform'
     }
+    environment {
+        AWS_DEFAULT_REGION = 'us-east-1'
+    }
 
     stages {
 
@@ -14,9 +17,15 @@ pipeline {
             }
         }
 
-        stage('Terraform Init') {
+       stage('Terraform Init') {
             steps {
-                sh 'terraform init'
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws_credentials'
+                ]]) {
+
+                    sh 'terraform init'
+                }
             }
         }
 
